@@ -224,17 +224,35 @@ export default function Billar({ difficulty = 1, onScore, onResult, resetKey }: 
       const sx = canvas.width / W, sy = canvas.height / H
       ctx.save()
       ctx.scale(sx, sy)
-      // felt
-      ctx.fillStyle = '#0c1f14'
+      // wooden rail
+      ctx.fillStyle = '#1a0f08'
       ctx.fillRect(0, 0, W, H)
-      ctx.strokeStyle = 'rgba(57,255,158,0.25)'
-      ctx.lineWidth = 4
-      ctx.strokeRect(6, 6, W - 12, H - 12)
-      // pockets
-      ctx.fillStyle = '#05070a'
+      // felt with subtle vignette
+      const grad = ctx.createRadialGradient(W / 2, H / 2, 40, W / 2, H / 2, W * 0.62)
+      grad.addColorStop(0, '#11402a')
+      grad.addColorStop(1, '#082316')
+      ctx.fillStyle = grad
+      ctx.fillRect(14, 14, W - 28, H - 28)
+      // cushions glow
+      ctx.strokeStyle = 'rgba(57,255,158,0.30)'
+      ctx.lineWidth = 3
+      ctx.strokeRect(14, 14, W - 28, H - 28)
+      // head string line
+      ctx.strokeStyle = 'rgba(255,255,255,0.07)'
+      ctx.lineWidth = 1
+      ctx.beginPath()
+      ctx.moveTo(W * 0.25, 16)
+      ctx.lineTo(W * 0.25, H - 16)
+      ctx.stroke()
+      // pockets with rim
       for (const [px, py] of POCKETS) {
+        ctx.fillStyle = '#2a1a0c'
         ctx.beginPath()
-        ctx.arc(px, py, POCKET_R - 4, 0, Math.PI * 2)
+        ctx.arc(px, py, POCKET_R, 0, Math.PI * 2)
+        ctx.fill()
+        ctx.fillStyle = '#04060a'
+        ctx.beginPath()
+        ctx.arc(px, py, POCKET_R - 5, 0, Math.PI * 2)
         ctx.fill()
       }
       // aim line

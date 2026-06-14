@@ -43,14 +43,17 @@ export function Card({
   className,
   hover,
   glow,
+  id,
 }: {
   children: ReactNode
   className?: string
   hover?: boolean
   glow?: string
+  id?: string
 }) {
   return (
     <div
+      id={id}
       className={cn('glass rounded-2xl', hover && 'glass-hover cursor-pointer', glow, className)}
     >
       {children}

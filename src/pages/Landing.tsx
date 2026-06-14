@@ -13,6 +13,7 @@ import {
   CheckCircle2,
 } from 'lucide-react'
 import { GAMES, accentClasses } from '@/lib/games'
+import { NeonSign } from '@/components/NeonSign'
 import { cn } from '@/lib/utils'
 
 function Neon({ children, className }: { children: React.ReactNode; className?: string }) {
@@ -59,15 +60,24 @@ export default function Landing() {
             <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-neon-green" />
             Prototipo en modo seguro · saldo 100% ficticio
           </motion.div>
+
+          {/* Giant broken-neon bar sign */}
+          <motion.div
+            initial={{ opacity: 0, scale: 0.92 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.8, delay: 0.05 }}
+            className="mb-4 flex justify-center"
+          >
+            <NeonSign className="text-[19vw] leading-none sm:text-[15vw] md:text-[11rem] lg:text-[13rem]" />
+          </motion.div>
+
           <motion.h1
             initial={{ opacity: 0, y: 24 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.7, delay: 0.05 }}
-            className="neon-title text-5xl leading-[0.95] text-zinc-50 sm:text-7xl md:text-8xl"
+            transition={{ duration: 0.7, delay: 0.15 }}
+            className="neon-title text-3xl leading-[0.95] text-zinc-50 sm:text-4xl md:text-5xl"
           >
-            Si te la juegas,
-            <br />
-            <span className="text-neon-red text-glow-red">que se pague.</span>
+            Si te la juegas, <span className="text-neon-red text-glow-red">que se pague.</span>
           </motion.h1>
           <motion.p
             initial={{ opacity: 0 }}
