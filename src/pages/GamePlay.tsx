@@ -17,12 +17,15 @@ const ENGINES: Record<string, ComponentType<GameComponentProps>> = {
   reflejos: lazy(() => import('@/games/Reflejos')),
   billar: lazy(() => import('@/games/Billar')),
   airhockey: lazy(() => import('@/games/AirHockey')),
-  dardos: lazy(() => import('@/games/Dados3D')),
+  dardos: lazy(() => import('@/games/Dardos')),
   penaltis: lazy(() => import('@/games/Penaltis')),
+  dados: lazy(() => import('@/games/Dados3D')),
+  carreras: lazy(() => import('@/games/Carrera3D')),
+  bolos: lazy(() => import('@/games/Bolos3D')),
 }
 
 // Which games are 3D (affects loading copy)
-const IS_3D = new Set(['dados'])
+const IS_3D = new Set(['dados', 'carreras', 'bolos'])
 
 
 export default function GamePlay() {
@@ -164,6 +167,9 @@ export default function GamePlay() {
           {gameId === 'airhockey' && 'Arrastra tu mazo por tu mitad para golpear el disco.'}
           {gameId === 'dardos' && 'Pulsa o toca para lanzar el dardo donde esté la mira.'}
           {gameId === 'penaltis' && 'Toca una zona de la portería (o teclas 1-6) para tirar y parar.'}
+          {gameId === 'dados' && 'Pulsa "Lanzar dados" y suma más que el rival. Al mejor de 5.'}
+          {gameId === 'carreras' && 'Cambia de carril con ←/→ (o A/D) y esquiva los obstáculos.'}
+          {gameId === 'bolos' && 'Ajusta puntería y para la barra de potencia en el punto verde.'}
         </div>
         <button onClick={() => setShowChat((v) => !v)} className="btn-ghost px-3 py-1.5 text-xs">
           Chat rápido
