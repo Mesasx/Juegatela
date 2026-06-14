@@ -177,7 +177,8 @@ export default function GameDetail() {
               {gameId === 'dados' && 'Juego 3D: pulsa "Lanzar dados". Gana la ronda quien saque la suma más alta. Al mejor de 5 rondas.'}
               {gameId === 'carreras' && 'Juego 3D: cambia de carril con ←/→, A/D o los botones táctiles, esquiva los obstáculos de neón y llega antes que el rival.'}
               {gameId === 'bolos' && 'Juego 3D: ajusta la puntería con el deslizador y para la barra de potencia en la zona verde para lanzar. Más bolos que el rival gana.'}
-              {!['pong', 'reflejos', 'billar', 'airhockey', 'dardos', 'penaltis', 'dados', 'carreras', 'bolos'].includes(gameId) && 'Próximamente disponible para jugar.'}
+              {gameId === 'farol' && 'Faroleo estilo Liar’s Bar contra 3 rivales: juega 1-3 cartas boca abajo afirmando que son la carta de la mesa, o acusa con "¡Mentiroso!". Quien pierde la ronda prueba suerte con el revólver. Último en pie gana.'}
+              {!['pong', 'reflejos', 'billar', 'airhockey', 'dardos', 'penaltis', 'dados', 'carreras', 'bolos', 'farol'].includes(gameId) && 'Próximamente disponible para jugar.'}
             </p>
           </div>
           <p className="text-[11px] text-zinc-500">

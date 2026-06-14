@@ -22,6 +22,7 @@ const ENGINES: Record<string, ComponentType<GameComponentProps>> = {
   dados: lazy(() => import('@/games/Dados3D')),
   carreras: lazy(() => import('@/games/Carrera3D')),
   bolos: lazy(() => import('@/games/Bolos3D')),
+  farol: lazy(() => import('@/games/Mentiroso')),
 }
 
 // Which games are 3D (affects loading copy)
@@ -170,6 +171,7 @@ export default function GamePlay() {
           {gameId === 'dados' && 'Pulsa "Lanzar dados" y suma más que el rival. Al mejor de 5.'}
           {gameId === 'carreras' && 'Cambia de carril con ←/→ (o A/D) y esquiva los obstáculos.'}
           {gameId === 'bolos' && 'Ajusta puntería y para la barra de potencia en el punto verde.'}
+          {gameId === 'farol' && 'Selecciona 1-3 cartas y juégalas como la carta de mesa, o grita "¡Mentiroso!".'}
         </div>
         <button onClick={() => setShowChat((v) => !v)} className="btn-ghost px-3 py-1.5 text-xs">
           Chat rápido

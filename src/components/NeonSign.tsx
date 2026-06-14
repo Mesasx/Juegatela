@@ -10,16 +10,16 @@ interface LetterCfg {
   g2?: string // outer bloom color
 }
 
-// Mixed old neon tubes: a few colors like a real bar sign
+// Letrero de neón rojo: todas las letras en tonos rojos
 const DEFAULT: LetterCfg[] = [
-  { ch: 'J', g1: '#ff2d55', g2: '#b14bff' },
-  { ch: 'U', g1: '#b14bff', g2: '#8a5cff' },
-  { ch: 'É', behavior: 'flicker', g1: '#2dd4ff', g2: '#22f5e0' },
-  { ch: 'G', g1: '#ff2d55', g2: '#ff3d81' },
-  { ch: 'A', g1: '#39ff9e', g2: '#22f5e0' },
-  { ch: 'T', behavior: 'flicker', g1: '#b14bff', g2: '#ff2d55' },
-  { ch: 'E', g1: '#ff2d55', g2: '#b14bff' },
-  { ch: 'L', g1: '#2dd4ff', g2: '#8a5cff' },
+  { ch: 'J', g1: '#ff2d55', g2: '#ff3d81' },
+  { ch: 'U', g1: '#ff2d55', g2: '#ff5277' },
+  { ch: 'É', behavior: 'flicker', g1: '#ff2d55', g2: '#ff3d81' },
+  { ch: 'G', g1: '#ff2d55', g2: '#ff5277' },
+  { ch: 'A', g1: '#ff2d55', g2: '#ff3d81' },
+  { ch: 'T', behavior: 'flicker', g1: '#ff2d55', g2: '#ff5277' },
+  { ch: 'E', g1: '#ff2d55', g2: '#ff3d81' },
+  { ch: 'L', g1: '#ff2d55', g2: '#ff5277' },
   { ch: 'A', behavior: 'dying', g1: '#ff2d55', g2: '#ff3d81' },
 ]
 
