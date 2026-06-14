@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { Skull, Crosshair, Hand } from 'lucide-react'
 import type { GameComponentProps } from './types'
 import { useStore } from '@/store/useStore'
+import { MentirosoRoom3D } from './MentirosoRoom3D'
 
 type Rank = 'A' | 'K' | 'Q' | 'J' // J = comodín
 interface Card { id: number; rank: Rank }
@@ -45,6 +46,13 @@ const SEAT_POS: Record<number, CSSProperties> = {
   1: { top: '6%', left: '0%' },
   3: { top: '-2%', left: '50%', transform: 'translateX(-50%)' },
   2: { top: '6%', right: '0%' },
+}
+
+// character base colour per rival id (used by the 3D room)
+const SEAT_COLOR: Record<number, string> = {
+  1: '#e8743b', // El Zorro — naranja zorro
+  2: '#8aa0b4', // Lobita — gris lobo
+  3: '#caa15a', // Águila — marrón dorado
 }
 
 export default function Mentiroso({ difficulty = 2, onScore, onResult, resetKey }: GameComponentProps) {
@@ -245,34 +253,34 @@ export default function Mentiroso({ difficulty = 2, onScore, onResult, resetKey 
         )}
       </div>
 
-      {/* ── bar table ── */}
-      <div className="relative flex-1" style={{ minHeight: 300 }}>
-        {/* felt */}
-        <div
-          className="absolute inset-x-[5%] inset-y-[12%] rounded-[50%] border border-neon-green/25"
-          style={{
-            background: 'radial-gradient(ellipse at 50% 38%, #135f3a, #083c24 68%, #052619)',
-            boxShadow: 'inset 0 0 70px rgba(0,0,0,0.65), 0 0 46px rgba(57,255,158,0.10)',
-          }}
+      {/* ── 3D bar room (primera persona) ── */}
+      <div className="relative flex-1 overflow-hidden rounded-xl border border-white/10" style={{ minHeight: 320 }}>
+        <MentirosoRoom3D
+          opponents={players.slice(1).map((p) => ({
+            id: p.id,
+            name: p.name,
+            color: SEAT_COLOR[p.id] ?? '#8aa0b4',
+            alive: p.alive,
+            current: current === p.id && (phase === 'play' || phase === 'reveal'),
+            cards: p.hand.length,
+          }))}
+          rankLabel={phase === 'intro' ? '' : RANK_LABEL[tableRank]}
+          centerState={reveal ? 'reveal' : roulette ? (roulette.dead ? 'dead' : 'roulette') : phase === 'intro' ? 'intro' : phase === 'over' ? 'over' : 'play'}
+          yourTurn={!!yourTurn}
         />
-        {/* rival seats around the table */}
-        {players.slice(1).map((p) => (
-          <div key={p.id} className="absolute w-24 sm:w-28" style={SEAT_POS[p.id]}>
-            <PlayerSeat p={p} current={current === p.id && (phase === 'play' || phase === 'reveal')} />
-          </div>
-        ))}
-        {/* your seat */}
-        {me && (
-          <div className="absolute bottom-0 left-1/2 w-28 -translate-x-1/2 sm:w-32">
-            <PlayerSeat p={me} current={yourTurn} you />
-          </div>
-        )}
 
-        {/* center of the table */}
-        <div className="absolute left-1/2 top-[42%] w-[72%] max-w-md -translate-x-1/2 -translate-y-1/2 text-center">
+        {/* status strip */}
+        <div className="pointer-events-none absolute inset-x-0 top-2 flex justify-center px-2">
+          <span className="chip max-w-[92%] truncate border border-white/10 bg-black/55 text-zinc-100 backdrop-blur">
+            {message}
+          </span>
+        </div>
+
+        {/* centred events overlay */}
+        <div className="absolute left-1/2 top-1/2 w-[82%] max-w-md -translate-x-1/2 -translate-y-1/2 text-center">
           <AnimatePresence mode="wait">
             {reveal ? (
-              <motion.div key="reveal" initial={{ scale: 0.8, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ opacity: 0 }} className="flex flex-col items-center gap-2">
+              <motion.div key="reveal" initial={{ scale: 0.8, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ opacity: 0 }} className="flex flex-col items-center gap-2 rounded-2xl bg-black/55 p-3 backdrop-blur">
                 <div className="flex gap-2">
                   {reveal.cards.map((c) => <CardFace key={c.id} card={c} faceUp />)}
                 </div>
@@ -281,7 +289,7 @@ export default function Mentiroso({ difficulty = 2, onScore, onResult, resetKey 
                 </div>
               </motion.div>
             ) : roulette ? (
-              <motion.div key="roul" initial={{ scale: 0.8, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="flex flex-col items-center gap-2">
+              <motion.div key="roul" initial={{ scale: 0.8, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="flex flex-col items-center gap-2 rounded-2xl bg-black/55 p-4 backdrop-blur">
                 <motion.div
                   animate={roulette.fired ? {} : { rotate: 360 }}
                   transition={{ duration: 0.5, repeat: roulette.fired ? 0 : Infinity, ease: 'linear' }}
@@ -293,11 +301,10 @@ export default function Mentiroso({ difficulty = 2, onScore, onResult, resetKey 
                     <Crosshair className="text-neon-amber" size={32} />
                   )}
                 </motion.div>
-                <div className="text-sm font-bold text-zinc-200">{message}</div>
               </motion.div>
             ) : phase === 'intro' ? (
-              <motion.div key="intro" initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex flex-col items-center gap-3">
-                <p className="text-xs text-zinc-400 sm:text-sm">
+              <motion.div key="intro" initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex flex-col items-center gap-3 rounded-2xl bg-black/55 p-4 backdrop-blur">
+                <p className="text-xs text-zinc-300 sm:text-sm">
                   Juega cartas boca abajo afirmando que son la carta de la mesa.
                   Si te pillan mintiendo —o acusas en falso— te toca <b className="text-neon-red">la ruleta</b>. Último en pie gana.
                 </p>
@@ -306,16 +313,10 @@ export default function Mentiroso({ difficulty = 2, onScore, onResult, resetKey 
                 </button>
               </motion.div>
             ) : phase === 'over' ? (
-              <motion.div key="over" initial={{ scale: 0.7, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="flex flex-col items-center gap-1">
+              <motion.div key="over" initial={{ scale: 0.7, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="rounded-2xl bg-black/55 px-5 py-3 backdrop-blur">
                 <div className="neon-title text-3xl text-neon-amber">{message}</div>
               </motion.div>
-            ) : (
-              <motion.div key="msg" initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex flex-col items-center gap-2">
-                {lastPlay ? <PileFan n={lastPlay.cards.length} /> : <span className="text-3xl opacity-40">🂠</span>}
-                <span className="chip border border-neon-purple/40 bg-ink-900/70 text-neon-purple">Mesa de {RANK_LABEL[tableRank]}</span>
-                <p className="text-xs text-zinc-300">{message}</p>
-              </motion.div>
-            )}
+            ) : null}
           </AnimatePresence>
         </div>
       </div>
