@@ -191,7 +191,7 @@ export default function Dados3D({ onScore, onResult, resetKey }: GameComponentPr
 
   return (
     <div className="relative h-full w-full" style={{ aspectRatio: '16/10' }}>
-      <Canvas shadows camera={{ position: [0, 6.5, 7], fov: 42 }} className="rounded-xl">
+      <Canvas shadows dpr={[1, 2]} gl={{ antialias: true }} camera={{ position: [0, 6.5, 7], fov: 42 }} className="rounded-xl">
         <Scene rollId={rollId} you={you} ai={ai} />
       </Canvas>
 

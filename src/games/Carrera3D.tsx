@@ -403,7 +403,7 @@ export default function Carrera3D({ difficulty = 1, onScore, onResult, resetKey 
         onPointerUp={onPointerUp}
         style={{ touchAction: 'none' }}
       >
-        <Canvas shadows camera={{ position: [0, 3.4, 8.5], fov: 55 }} className="rounded-xl">
+        <Canvas shadows dpr={[1, 2]} gl={{ antialias: true }} camera={{ position: [0, 3.4, 8.5], fov: 55 }} className="rounded-xl">
           <Scene
             laneX={laneX}
             tilt={tilt}

@@ -450,7 +450,7 @@ export default function Bolos3D({ difficulty = 2, onScore, onResult, resetKey }:
 
   return (
     <div className="relative h-full w-full select-none" style={{ aspectRatio: '16/10' }}>
-      <Canvas shadows camera={{ position: [0, 3.2, 11], fov: 48 }} className="rounded-xl">
+      <Canvas shadows dpr={[1, 2]} gl={{ antialias: true }} camera={{ position: [0, 3.2, 11], fov: 48 }} className="rounded-xl">
         <Scene pins={pinRefs} ballRef={ballRef} throwRef={throwRef} onArrive={onArrive} />
       </Canvas>
 
