@@ -171,7 +171,10 @@ export default function GameDetail() {
               {gameId === 'pong' && 'Mueve la pala con el ratón, el dedo o las teclas ↑/↓ (o W/S). Primero en llegar a 7 gana.'}
               {gameId === 'reflejos' && 'Espera a que el panel se ponga verde y pulsa lo más rápido posible. Adelantarte pierde la ronda. Al mejor de 5.'}
               {gameId === 'billar' && 'Arrastra desde la bola blanca hacia atrás para apuntar y regular la fuerza, y suelta para tirar. Mete más bolas que el rival.'}
-              {!['pong', 'reflejos', 'billar'].includes(gameId) && 'Próximamente disponible para jugar.'}
+              {gameId === 'airhockey' && 'Arrastra tu mazo (mitad inferior) para golpear el disco. Mete 7 goles en la portería rival antes que él.'}
+              {gameId === 'dardos' && 'La mira se mueve sola: pulsa o toca para clavar el dardo. Empiezas en 301 y debes llegar justo a 0. Si te pasas, pierdes el turno.'}
+              {gameId === 'penaltis' && 'Tanda al mejor de 5: cuando tiras, elige zona de la portería (toca o teclas 1-6); cuando paras, elige hacia dónde te lanzas.'}
+              {!['pong', 'reflejos', 'billar', 'airhockey', 'dardos', 'penaltis'].includes(gameId) && 'Próximamente disponible para jugar.'}
             </p>
           </div>
           <p className="text-[11px] text-zinc-500">

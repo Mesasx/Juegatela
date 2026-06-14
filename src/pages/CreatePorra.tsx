@@ -1,11 +1,13 @@
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { ArrowLeft, Plus, Trash2, Dices, Coins } from 'lucide-react'
+import { motion } from 'framer-motion'
+import { ArrowLeft, Plus, Trash2, Dices, Coins, Flame, Check } from 'lucide-react'
 import { useStore } from '@/store/useStore'
 import { PageHeader, useAuthGate } from '@/components/shared'
-import { Card } from '@/components/ui/Primitives'
+import { Card, Chip } from '@/components/ui/Primitives'
 import { cn, fichas, uid } from '@/lib/utils'
 import type { PorraType } from '@/lib/types'
+import { TRENDING_PORRAS, TRENDING_CATEGORIES, type TrendingPorra } from '@/lib/trending'
 
 const TYPES: { id: PorraType; label: string; desc: string }[] = [
   { id: 'single', label: 'Ganador único', desc: 'Quien acierte se lleva todo el bote' },
@@ -29,8 +31,26 @@ export default function CreatePorra() {
   const [entry, setEntry] = useState(5)
   const [options, setOptions] = useState(['', ''])
   const [closeDate, setCloseDate] = useState('')
+  const [activeTpl, setActiveTpl] = useState<string | null>(null)
+  const [cat, setCat] = useState<string>('Todos')
 
   const valid = title.trim().length > 2 && options.filter((o) => o.trim()).length >= 2
+
+  const trending = useMemo(
+    () => (cat === 'Todos' ? TRENDING_PORRAS : TRENDING_PORRAS.filter((t) => t.category === cat)),
+    [cat]
+  )
+
+  function applyTemplate(t: TrendingPorra) {
+    setActiveTpl(t.id)
+    setTitle(t.title)
+    setDescription(t.description)
+    setType(t.type)
+    setEntry(t.entry)
+    setOptions(t.options.length >= 2 ? t.options : [...t.options, ''])
+    // smooth-scroll the user down to the form
+    setTimeout(() => document.getElementById('porra-form')?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 60)
+  }
 
   function create() {
     guard(() => {
@@ -60,7 +80,55 @@ export default function CreatePorra() {
       <button onClick={() => navigate('/porras')} className="btn-ghost mb-4 px-3 py-2"><ArrowLeft size={16} /> Porras</button>
       <PageHeader eyebrow="Nueva porra" title="Monta una porra" subtitle="Elige el tipo, las opciones y la entrada. El bote se reparte solo al cerrar." />
 
-      <Card className="space-y-4 p-5">
+      {/* ── Eventos en auge ── */}
+      <div className="mb-6">
+        <div className="mb-3 flex items-center gap-2">
+          <Flame className="text-neon-amber" size={18} />
+          <h2 className="neon-title text-xl text-zinc-100">Eventos en auge ahora mismo</h2>
+        </div>
+        <div className="scrollbar-none mb-3 flex gap-2 overflow-x-auto pb-1">
+          {['Todos', ...TRENDING_CATEGORIES].map((c) => (
+            <button
+              key={c}
+              onClick={() => setCat(c)}
+              className={cn(
+                'chip whitespace-nowrap border transition',
+                cat === c ? 'border-neon-amber/50 bg-neon-amber/15 text-neon-amber' : 'border-white/10 bg-white/5 text-zinc-400 hover:text-white'
+              )}
+            >
+              {c}
+            </button>
+          ))}
+        </div>
+        <div className="scrollbar-none flex gap-3 overflow-x-auto pb-2">
+          {trending.map((t, i) => (
+            <motion.button
+              key={t.id}
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: i * 0.03 }}
+              onClick={() => applyTemplate(t)}
+              className={cn(
+                'glass glass-hover relative w-56 shrink-0 rounded-2xl p-4 text-left',
+                activeTpl === t.id ? 'border-neon-amber/60 shadow-[0_0_0_1px_rgba(255,182,39,0.4)]' : ''
+              )}
+            >
+              <div className="mb-1.5 flex items-center justify-between">
+                <span className="text-2xl">{t.emoji}</span>
+                {t.hot ? <Chip tone="red"><Flame size={10} /> en auge</Chip> : <Chip tone="zinc">{t.category}</Chip>}
+              </div>
+              <div className="text-sm font-bold leading-tight text-zinc-100">{t.title}</div>
+              <p className="mt-1 line-clamp-2 text-[11px] text-zinc-500">{t.description}</p>
+              <div className="mt-2 flex items-center gap-1 text-[11px] font-semibold text-neon-amber">
+                {activeTpl === t.id ? <><Check size={12} /> Aplicada</> : <>Usar plantilla</>}
+              </div>
+            </motion.button>
+          ))}
+        </div>
+        <p className="mt-1 text-[11px] text-zinc-600">Toca una plantilla para rellenar la porra al instante. Luego puedes editarla.</p>
+      </div>
+
+      <Card id="porra-form" className="space-y-4 p-5">
         <div>
           <label className="label">Título</label>
           <input className="input" placeholder="Ej: Resultado exacto España-Cabo Verde" value={title} onChange={(e) => setTitle(e.target.value)} />

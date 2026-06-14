@@ -11,6 +11,9 @@ import type { GameResult } from '@/games/types'
 import Pong from '@/games/Pong'
 import Reflejos from '@/games/Reflejos'
 import Billar from '@/games/Billar'
+import AirHockey from '@/games/AirHockey'
+import Dardos from '@/games/Dardos'
+import Penaltis from '@/games/Penaltis'
 
 const QUICK_CHAT = ['¡Buena!', 'Suerte', 'Uff…', 'Revancha 😏', 'GG', 'Mírame ahora']
 
@@ -18,6 +21,9 @@ const ENGINES: Record<string, typeof Pong> = {
   pong: Pong,
   reflejos: Reflejos,
   billar: Billar,
+  airhockey: AirHockey,
+  dardos: Dardos,
+  penaltis: Penaltis,
 }
 
 export default function GamePlay() {
@@ -147,6 +153,9 @@ export default function GamePlay() {
           {gameId === 'pong' && 'Ratón / dedo o ↑↓ (W/S) para mover la pala.'}
           {gameId === 'reflejos' && 'Pulsa o toca cuando se ponga verde.'}
           {gameId === 'billar' && 'Arrastra desde la bola blanca y suelta para tirar.'}
+          {gameId === 'airhockey' && 'Arrastra tu mazo por tu mitad para golpear el disco.'}
+          {gameId === 'dardos' && 'Pulsa o toca para lanzar el dardo donde esté la mira.'}
+          {gameId === 'penaltis' && 'Toca una zona de la portería (o teclas 1-6) para tirar y parar.'}
         </div>
         <button onClick={() => setShowChat((v) => !v)} className="btn-ghost px-3 py-1.5 text-xs">
           Chat rápido
