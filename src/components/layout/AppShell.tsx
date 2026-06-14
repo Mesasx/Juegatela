@@ -1,9 +1,10 @@
 import { type ReactNode } from 'react'
-import { Link, NavLink, useNavigate } from 'react-router-dom'
+import { Link, NavLink, useNavigate, useLocation } from 'react-router-dom'
 import { LogOut, Plus, Bell, Coins, ShieldQuestion } from 'lucide-react'
 import { primaryNav, secondaryNav, bottomNav } from '@/lib/nav'
 import { useStore, useUnreadCount } from '@/store/useStore'
 import { Avatar } from '@/components/ui/Primitives'
+import { BarScene } from '@/components/BarScene'
 import { cn, fichas } from '@/lib/utils'
 
 function Brand() {
@@ -35,9 +36,17 @@ export function AppShell({ children }: { children: ReactNode }) {
   const logout = useStore((s) => s.logout)
   const unread = useUnreadCount()
   const navigate = useNavigate()
+  const location = useLocation()
+  // playing → show the bar's tables; everywhere else → the bar counter
+  const barVariant = location.pathname.startsWith('/jugar') ? 'mesas' : 'barra'
 
   return (
-    <div className="smoke min-h-screen">
+    <div className="smoke relative min-h-screen">
+      {/* ── Living bar backdrop ── */}
+      <div className="fixed inset-0 z-0">
+        <BarScene variant={barVariant} />
+      </div>
+
       {/* ── Desktop sidebar ── */}
       <aside className="fixed inset-y-0 left-0 z-40 hidden w-64 flex-col border-r border-white/5 bg-ink-900/80 backdrop-blur-xl lg:flex">
         <div className="px-5 py-5">
@@ -83,7 +92,7 @@ export function AppShell({ children }: { children: ReactNode }) {
       </aside>
 
       {/* ── Main column ── */}
-      <div className="lg:pl-64">
+      <div className="relative z-10 lg:pl-64">
         {/* Topbar */}
         <header className="sticky top-0 z-30 flex h-16 items-center justify-between gap-3 border-b border-white/5 bg-ink-950/70 px-4 backdrop-blur-xl sm:px-6">
           <div className="lg:hidden">

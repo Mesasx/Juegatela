@@ -1,7 +1,8 @@
-import { useEffect, useRef, useState, useCallback } from 'react'
+import { useEffect, useRef, useState, useCallback, type CSSProperties } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Skull, Crosshair, Hand } from 'lucide-react'
 import type { GameComponentProps } from './types'
+import { useStore } from '@/store/useStore'
 
 type Rank = 'A' | 'K' | 'Q' | 'J' // J = comodín
 interface Card { id: number; rank: Rank }
@@ -39,6 +40,13 @@ const AI_DEFS = [
   { name: 'Águila', avatar: '🦅' },
 ]
 
+// seats around the felt: id1 Zorro (left), id3 Águila (top), id2 Lobita (right)
+const SEAT_POS: Record<number, CSSProperties> = {
+  1: { top: '6%', left: '0%' },
+  3: { top: '-2%', left: '50%', transform: 'translateX(-50%)' },
+  2: { top: '6%', right: '0%' },
+}
+
 export default function Mentiroso({ difficulty = 2, onScore, onResult, resetKey }: GameComponentProps) {
   const [players, setPlayers] = useState<Player[]>([])
   const [tableRank, setTableRank] = useState<Exclude<Rank, 'J'>>('Q')
@@ -62,7 +70,7 @@ export default function Mentiroso({ difficulty = 2, onScore, onResult, resetKey 
     timers.current = []
     finished.current = false
     const ps: Player[] = [
-      { id: 0, name: 'Tú', avatar: '🎭', isYou: true, hand: [], alive: true, bulletPos: Math.floor(Math.random() * 6), pulls: 0 },
+      { id: 0, name: 'Tú', avatar: useStore.getState().user.avatar || '🎭', isYou: true, hand: [], alive: true, bulletPos: Math.floor(Math.random() * 6), pulls: 0 },
       ...AI_DEFS.map((a, i) => ({
         id: i + 1, name: a.name, avatar: a.avatar, isYou: false, hand: [], alive: true,
         bulletPos: Math.floor(Math.random() * 6), pulls: 0,
@@ -237,66 +245,79 @@ export default function Mentiroso({ difficulty = 2, onScore, onResult, resetKey 
         )}
       </div>
 
-      {/* rivals */}
-      <div className="grid grid-cols-3 gap-2">
+      {/* ── bar table ── */}
+      <div className="relative flex-1" style={{ minHeight: 300 }}>
+        {/* felt */}
+        <div
+          className="absolute inset-x-[5%] inset-y-[12%] rounded-[50%] border border-neon-green/25"
+          style={{
+            background: 'radial-gradient(ellipse at 50% 38%, #135f3a, #083c24 68%, #052619)',
+            boxShadow: 'inset 0 0 70px rgba(0,0,0,0.65), 0 0 46px rgba(57,255,158,0.10)',
+          }}
+        />
+        {/* rival seats around the table */}
         {players.slice(1).map((p) => (
-          <div
-            key={p.id}
-            className={`glass rounded-xl p-2 text-center transition ${current === p.id && phase === 'play' ? 'ring-1 ring-neon-red' : ''} ${!p.alive ? 'opacity-40 grayscale' : ''}`}
-          >
-            <div className="text-2xl">{p.avatar}</div>
-            <div className="truncate text-xs font-bold text-zinc-200">{p.name}</div>
-            <div className="text-[10px] text-zinc-500">{p.alive ? `${p.hand.length} cartas` : 'fuera'}</div>
-            <Cylinder pulls={p.pulls} dead={!p.alive} />
+          <div key={p.id} className="absolute w-24 sm:w-28" style={SEAT_POS[p.id]}>
+            <PlayerSeat p={p} current={current === p.id && (phase === 'play' || phase === 'reveal')} />
           </div>
         ))}
-      </div>
+        {/* your seat */}
+        {me && (
+          <div className="absolute bottom-0 left-1/2 w-28 -translate-x-1/2 sm:w-32">
+            <PlayerSeat p={me} current={yourTurn} you />
+          </div>
+        )}
 
-      {/* center message */}
-      <div className="flex flex-1 items-center justify-center px-2 py-3 text-center">
-        <AnimatePresence mode="wait">
-          {reveal ? (
-            <motion.div key="reveal" initial={{ scale: 0.8, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ opacity: 0 }} className="flex flex-col items-center gap-2">
-              <div className="flex gap-2">
-                {reveal.cards.map((c) => <CardFace key={c.id} card={c} faceUp />)}
-              </div>
-              <div className={`text-sm font-bold ${reveal.truth ? 'text-neon-green' : 'text-neon-red'}`}>
-                {reveal.truth ? 'Eran verdad ✓' : '¡Había trampa! ✗'}
-              </div>
-            </motion.div>
-          ) : roulette ? (
-            <motion.div key="roul" initial={{ scale: 0.8, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="flex flex-col items-center gap-3">
-              <motion.div
-                animate={roulette.fired ? {} : { rotate: 360 }}
-                transition={{ duration: 0.5, repeat: roulette.fired ? 0 : Infinity, ease: 'linear' }}
-                className={`grid h-20 w-20 place-items-center rounded-full border-4 ${roulette.dead ? 'border-neon-red' : 'border-white/30'}`}
-              >
-                {roulette.fired ? (
-                  roulette.dead ? <Skull className="text-neon-red" size={36} /> : <span className="text-xs font-bold text-zinc-300">click</span>
-                ) : (
-                  <Crosshair className="text-neon-amber" size={32} />
-                )}
-              </motion.div>
-              <div className="text-sm font-bold text-zinc-200">{message}</div>
-            </motion.div>
-          ) : (
-            <motion.div key="msg" initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="max-w-md text-sm text-zinc-300">
-              {phase === 'intro' ? (
-                <div className="flex flex-col items-center gap-4">
-                  <p className="text-zinc-400">
-                    Faroleo al estilo del bar: juega cartas boca abajo afirmando que son todas la carta de la mesa.
-                    Si te acusan y mentías —o acusas y era verdad— te toca <b className="text-neon-red">la ruleta del revólver</b>. Último en pie gana.
-                  </p>
-                  <button className="btn-primary" onClick={() => startRound(players, Math.floor(Math.random() * 4))}>
-                    Repartir y empezar
-                  </button>
+        {/* center of the table */}
+        <div className="absolute left-1/2 top-[42%] w-[72%] max-w-md -translate-x-1/2 -translate-y-1/2 text-center">
+          <AnimatePresence mode="wait">
+            {reveal ? (
+              <motion.div key="reveal" initial={{ scale: 0.8, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ opacity: 0 }} className="flex flex-col items-center gap-2">
+                <div className="flex gap-2">
+                  {reveal.cards.map((c) => <CardFace key={c.id} card={c} faceUp />)}
                 </div>
-              ) : (
-                <span>{message}</span>
-              )}
-            </motion.div>
-          )}
-        </AnimatePresence>
+                <div className={`text-sm font-bold ${reveal.truth ? 'text-neon-green' : 'text-neon-red'}`}>
+                  {reveal.truth ? 'Eran verdad ✓' : '¡Había trampa! ✗'}
+                </div>
+              </motion.div>
+            ) : roulette ? (
+              <motion.div key="roul" initial={{ scale: 0.8, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="flex flex-col items-center gap-2">
+                <motion.div
+                  animate={roulette.fired ? {} : { rotate: 360 }}
+                  transition={{ duration: 0.5, repeat: roulette.fired ? 0 : Infinity, ease: 'linear' }}
+                  className={`grid h-20 w-20 place-items-center rounded-full border-4 ${roulette.dead ? 'border-neon-red shadow-neon-red' : 'border-white/30'}`}
+                >
+                  {roulette.fired ? (
+                    roulette.dead ? <Skull className="text-neon-red" size={36} /> : <span className="text-xs font-bold text-zinc-300">click</span>
+                  ) : (
+                    <Crosshair className="text-neon-amber" size={32} />
+                  )}
+                </motion.div>
+                <div className="text-sm font-bold text-zinc-200">{message}</div>
+              </motion.div>
+            ) : phase === 'intro' ? (
+              <motion.div key="intro" initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex flex-col items-center gap-3">
+                <p className="text-xs text-zinc-400 sm:text-sm">
+                  Juega cartas boca abajo afirmando que son la carta de la mesa.
+                  Si te pillan mintiendo —o acusas en falso— te toca <b className="text-neon-red">la ruleta</b>. Último en pie gana.
+                </p>
+                <button className="btn-primary" onClick={() => startRound(players, Math.floor(Math.random() * 4))}>
+                  Repartir y empezar
+                </button>
+              </motion.div>
+            ) : phase === 'over' ? (
+              <motion.div key="over" initial={{ scale: 0.7, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="flex flex-col items-center gap-1">
+                <div className="neon-title text-3xl text-neon-amber">{message}</div>
+              </motion.div>
+            ) : (
+              <motion.div key="msg" initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex flex-col items-center gap-2">
+                {lastPlay ? <PileFan n={lastPlay.cards.length} /> : <span className="text-3xl opacity-40">🂠</span>}
+                <span className="chip border border-neon-purple/40 bg-ink-900/70 text-neon-purple">Mesa de {RANK_LABEL[tableRank]}</span>
+                <p className="text-xs text-zinc-300">{message}</p>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
       </div>
 
       {/* your hand + actions */}
@@ -357,6 +378,58 @@ function CardFace({ card, faceUp, selected }: { card: Card; faceUp?: boolean; se
       ) : (
         <span className="text-lg opacity-40">🂠</span>
       )}
+    </div>
+  )
+}
+
+function PlayerSeat({ p, current, you }: { p: Player; current?: boolean; you?: boolean }) {
+  return (
+    <div className={`flex flex-col items-center ${!p.alive ? 'opacity-45 grayscale' : ''}`}>
+      <div
+        className={`relative grid h-12 w-12 place-items-center rounded-full border-2 bg-ink-900/80 text-2xl transition ${
+          current ? 'border-neon-red shadow-neon-red' : you ? 'border-neon-green/60' : 'border-white/15'
+        }`}
+      >
+        <span>{p.avatar}</span>
+        {!p.alive && (
+          <span className="absolute inset-0 grid place-items-center rounded-full bg-black/60 text-neon-red">
+            <Skull size={20} />
+          </span>
+        )}
+      </div>
+      <div className="mt-1 max-w-[6.5rem] truncate text-[11px] font-bold text-zinc-200">{p.name}</div>
+      {p.alive ? <CardBacks n={p.hand.length} /> : <span className="text-[10px] text-neon-red">fuera</span>}
+      <Cylinder pulls={p.pulls} dead={!p.alive} />
+    </div>
+  )
+}
+
+function CardBacks({ n }: { n: number }) {
+  return (
+    <div className="flex h-4 items-center">
+      {Array.from({ length: Math.min(n, 5) }).map((_, i) => (
+        <span
+          key={i}
+          className="-ml-1.5 h-4 w-3 rounded-[2px] border border-white/20 bg-gradient-to-b from-ink-600 to-ink-850 first:ml-0"
+        />
+      ))}
+      {n > 0 && <span className="ml-1 text-[10px] text-zinc-500">{n}</span>}
+    </div>
+  )
+}
+
+function PileFan({ n }: { n: number }) {
+  return (
+    <div className="flex h-16 items-center justify-center">
+      {Array.from({ length: Math.min(Math.max(n, 1), 3) }).map((_, i, arr) => (
+        <div
+          key={i}
+          className="-ml-5 grid h-16 w-11 place-items-center rounded-lg border border-white/20 bg-gradient-to-b from-ink-700 to-ink-850 shadow-panel first:ml-0"
+          style={{ transform: `rotate(${(i - (arr.length - 1) / 2) * 8}deg)` }}
+        >
+          <span className="text-lg opacity-40">🂠</span>
+        </div>
+      ))}
     </div>
   )
 }

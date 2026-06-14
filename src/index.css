@@ -238,3 +238,195 @@
   }
   .neon-sign .dying { opacity: 0.7; }
 }
+
+/* ════════════════════════════════════════════════════════════════════════ */
+/* BarScene — fondo de bar clandestino animado (solo CSS, prefijo `bar-`)    */
+/* ════════════════════════════════════════════════════════════════════════ */
+
+/* Glow ambiental difuso del fondo, respira lentamente */
+.bar-ambient {
+  background-image:
+    radial-gradient(circle at 18% 78%, rgba(255, 45, 85, 0.18), transparent 38%),
+    radial-gradient(circle at 50% 26%, rgba(177, 75, 255, 0.16), transparent 42%),
+    radial-gradient(circle at 84% 70%, rgba(45, 212, 255, 0.14), transparent 40%),
+    radial-gradient(circle at 64% 96%, rgba(57, 255, 158, 0.10), transparent 36%);
+  animation: bar-breathe 9s ease-in-out infinite;
+}
+@keyframes bar-breathe {
+  0%, 100% { opacity: 0.85; }
+  50% { opacity: 1; }
+}
+
+/* Humo / vaho que se desplaza horizontalmente */
+.bar-smoke {
+  background-image:
+    radial-gradient(60% 40% at 30% 60%, rgba(177, 75, 255, 0.10), transparent 70%),
+    radial-gradient(55% 35% at 70% 50%, rgba(45, 212, 255, 0.08), transparent 70%);
+  background-size: 220% 220%;
+  filter: blur(8px);
+  animation: bar-smoke-drift 26s linear infinite;
+  mix-blend-mode: screen;
+}
+@keyframes bar-smoke-drift {
+  0% { background-position: 0% 50%; }
+  100% { background-position: 100% 50%; }
+}
+
+/* Viñeta para profundidad */
+.bar-vignette {
+  background: radial-gradient(120% 90% at 50% 45%, transparent 45%, rgba(0, 0, 0, 0.7) 100%);
+}
+
+/* Overlay oscuro para legibilidad del contenido superpuesto */
+.bar-overlay {
+  background: linear-gradient(
+    180deg,
+    rgba(7, 5, 9, 0.74) 0%,
+    rgba(7, 5, 9, 0.6) 40%,
+    rgba(7, 5, 9, 0.82) 100%
+  );
+}
+
+/* Botellas del estante: parpadeo/glow alterno */
+.bar-bottle rect {
+  fill: var(--c, #b14bff);
+}
+.bar-bottle {
+  animation: bar-bottle-glow 3.4s ease-in-out infinite;
+  animation-delay: var(--d, 0s);
+  filter: drop-shadow(0 0 2px var(--c, #b14bff));
+}
+@keyframes bar-bottle-glow {
+  0%, 100% { opacity: 0.45; filter: drop-shadow(0 0 1px var(--c)); }
+  50% { opacity: 1; filter: drop-shadow(0 0 5px var(--c)); }
+}
+
+/* Brillo del borde del mostrador */
+.bar-counter-glow { animation: bar-edge 4s ease-in-out infinite; }
+@keyframes bar-edge {
+  0%, 100% { opacity: 0.25; }
+  50% { opacity: 0.55; }
+}
+
+/* Jarra que se llena: el relleno ámbar sube (scaleY) en bucle */
+.bar-fill { animation: bar-fill 6s ease-in-out infinite; animation-delay: var(--d, 0s); }
+@keyframes bar-fill {
+  0% { transform: scaleY(0); }
+  55% { transform: scaleY(1); }
+  78% { transform: scaleY(1); }
+  100% { transform: scaleY(0); }
+}
+/* Espuma: aparece cuando la jarra está llena */
+.bar-foam { animation: bar-foam 6s ease-in-out infinite; animation-delay: var(--d, 0s); }
+@keyframes bar-foam {
+  0%, 35% { opacity: 0; transform: translateY(4px); }
+  55%, 78% { opacity: 0.95; transform: translateY(0); }
+  100% { opacity: 0; transform: translateY(4px); }
+}
+
+/* Camarero escanciando: brazo que rota como sirviendo */
+.bar-pour { animation: bar-pour 2.6s ease-in-out infinite; }
+@keyframes bar-pour {
+  0%, 100% { transform: rotate(-6deg); }
+  50% { transform: rotate(24deg); }
+}
+.bar-pour-stream { animation: bar-stream 2.6s ease-in-out infinite; }
+@keyframes bar-stream {
+  0%, 30%, 100% { opacity: 0; }
+  45%, 70% { opacity: 0.9; }
+}
+
+/* Camarero lavando: leve frote */
+.bar-scrub { animation: bar-scrub 0.9s ease-in-out infinite; }
+@keyframes bar-scrub {
+  0%, 100% { transform: rotate(-8deg) translateX(0); }
+  50% { transform: rotate(6deg) translateX(2px); }
+}
+
+/* Clientes: leve balanceo (bob) desincronizado por --d */
+.bar-bob { animation: bar-bob 4.2s ease-in-out infinite; animation-delay: var(--d, 0s); }
+@keyframes bar-bob {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  50% { transform: translateY(-1.5px) rotate(-1.2deg); }
+}
+
+/* Camarero cruzando con bandeja de un lado a otro */
+.bar-cross { animation: bar-cross 12s linear infinite; }
+.bar-cross--slow { animation-duration: 16s; }
+@keyframes bar-cross {
+  0% { transform: translateX(-60px); opacity: 0; }
+  6% { opacity: 1; }
+  94% { opacity: 1; }
+  100% { transform: translateX(460px); opacity: 0; }
+}
+
+/* Lámparas colgantes: glow que parpadea como neón viejo */
+.bar-lamp-bulb {
+  animation: bar-lamp 4.6s ease-in-out infinite;
+  animation-delay: var(--d, 0s);
+  transform-box: fill-box;
+  transform-origin: center;
+}
+.bar-lamp { animation: bar-sway 6s ease-in-out infinite; animation-delay: var(--d, 0s); transform-box: fill-box; transform-origin: top center; }
+@keyframes bar-lamp {
+  0%, 100% { opacity: 0.55; filter: brightness(0.9); }
+  43% { opacity: 0.9; }
+  45% { opacity: 0.3; }
+  47% { opacity: 1; filter: brightness(1.4); }
+  60% { opacity: 0.75; }
+}
+@keyframes bar-sway {
+  0%, 100% { transform: rotate(-1.2deg); }
+  50% { transform: rotate(1.2deg); }
+}
+
+/* Mesas: cliente que levanta el brazo (pedir la cuenta) */
+.bar-raise { animation: bar-raise 5s ease-in-out infinite; }
+@keyframes bar-raise {
+  0%, 40%, 100% { transform: rotate(0deg); }
+  55% { transform: rotate(-22deg); }
+  70% { transform: rotate(-14deg); }
+  85% { transform: rotate(-22deg); }
+}
+
+/* Vela parpadeante en las mesas */
+.bar-flame {
+  animation: bar-flame 1.4s ease-in-out infinite;
+  animation-delay: var(--d, 0s);
+  transform-box: fill-box;
+  transform-origin: bottom center;
+  filter: drop-shadow(0 0 4px #ffb627);
+}
+@keyframes bar-flame {
+  0%, 100% { transform: scaleY(1) scaleX(1); opacity: 0.95; }
+  50% { transform: scaleY(1.15) scaleX(0.9); opacity: 1; }
+}
+.bar-candle-glow { animation: bar-candle 2.2s ease-in-out infinite; animation-delay: var(--d, 0s); }
+@keyframes bar-candle {
+  0%, 100% { opacity: 0.5; }
+  50% { opacity: 0.85; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bar-ambient,
+  .bar-smoke,
+  .bar-bottle,
+  .bar-counter-glow,
+  .bar-fill,
+  .bar-foam,
+  .bar-pour,
+  .bar-pour-stream,
+  .bar-scrub,
+  .bar-bob,
+  .bar-cross,
+  .bar-lamp,
+  .bar-lamp-bulb,
+  .bar-raise,
+  .bar-flame,
+  .bar-candle-glow {
+    animation: none !important;
+  }
+  /* deja las jarras a medio llenar y la espuma visible al congelar */
+  .bar-fill { transform: scaleY(0.7); }
+  .bar-foam { opacity: 0.95; }
+}
