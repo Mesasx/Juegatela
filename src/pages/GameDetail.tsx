@@ -174,7 +174,10 @@ export default function GameDetail() {
               {gameId === 'airhockey' && 'Arrastra tu mazo (mitad inferior) para golpear el disco. Mete 7 goles en la portería rival antes que él.'}
               {gameId === 'dardos' && 'La mira se mueve sola: pulsa o toca para clavar el dardo. Empiezas en 301 y debes llegar justo a 0. Si te pasas, pierdes el turno.'}
               {gameId === 'penaltis' && 'Tanda al mejor de 5: cuando tiras, elige zona de la portería (toca o teclas 1-6); cuando paras, elige hacia dónde te lanzas.'}
-              {!['pong', 'reflejos', 'billar', 'airhockey', 'dardos', 'penaltis'].includes(gameId) && 'Próximamente disponible para jugar.'}
+              {gameId === 'dados' && 'Juego 3D: pulsa "Lanzar dados". Gana la ronda quien saque la suma más alta. Al mejor de 5 rondas.'}
+              {gameId === 'carreras' && 'Juego 3D: cambia de carril con ←/→, A/D o los botones táctiles, esquiva los obstáculos de neón y llega antes que el rival.'}
+              {gameId === 'bolos' && 'Juego 3D: ajusta la puntería con el deslizador y para la barra de potencia en la zona verde para lanzar. Más bolos que el rival gana.'}
+              {!['pong', 'reflejos', 'billar', 'airhockey', 'dardos', 'penaltis', 'dados', 'carreras', 'bolos'].includes(gameId) && 'Próximamente disponible para jugar.'}
             </p>
           </div>
           <p className="text-[11px] text-zinc-500">
